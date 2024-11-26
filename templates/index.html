@@ -1,0 +1,20 @@
+{% extends "base.html" %}
+{% block title %}Home{% endblock %}
+{% block content %}
+<h2>Find Markets and Recipes Near You</h2>
+<form action="/" method="POST">
+    <label for="zip">ZIP Code:</label>
+    <input type="text" name="zip" id="zip" required>
+    <label for="radius">Radius (miles):</label>
+    <input type="number" name="radius" id="radius" required>
+    <br>
+    <label for="query">Search for a Recipe:</label>
+    <input type="text" name="query" id="query" required>
+    <label for="cuisine">Cuisine Type (Optional):</label>
+    <input type="text" name="cuisine" id="cuisine">
+    <label for="health">Health Restriction (Optional):</label>
+    <input type="text" name="health" id="health">
+    <br>
+    <button type="submit">Find</button>
+</form>
+{% endblock %}

@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Results{% endblock %}
+{% block content %}
+
+<h1>Farmers Market and Recipes</h1>
+    <h2>Farmers Markets Located Near You</h2>
+    <ul>
+        <-- loop through farmers market data -->
+        {% for market in farmers_markets %}
+        <li>
+            <strong>{{ market.name }}</strong><br>
+            {{ market.address }}
+            Distance: {{ market.distance }} miles
+        </li>
+        {% endfor %}
+    </ul>
+
+<h2>Recipe Ideas</h2>
+<ul>
+    {% for recipe in recipes %}
+    <li>
+        <strong>{{ recipe.recipe.label }}</strong><br>
+        <a href="{{ recipe.recipe.url }}" target="_blank">View Recipe</a><br>
+    </li>
+    {% endfor %}
+</ul>
+<a href="/">Go Back</a>
+{% endblock %}
+
+
