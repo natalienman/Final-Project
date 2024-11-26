@@ -51,7 +51,7 @@ def index():
     # render "index.html" template with a form to enter zip code, radius, recipe query, and preferences
 
 
-app.route('/results')
+@app.route('/results')
 def results():
     # method post
     # retrieve form data
