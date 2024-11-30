@@ -13,7 +13,7 @@ edamam_id = "1eeca7af"
 edamam_key = "68bfe1b3723a03103e9ce043fbd9661c"
 edamam_url = "https://api.edamam.com/api/recipes/v2"
 
-def get_farmers_markets(zip_code, radius):
+def get_farmers_markets(zip_code, radius,max_results=5):
     # new_url = farmers_market_url + "?apikey=" + farmers_market_key
     parameters = {
         "apikey" : farmers_market_key,
@@ -27,7 +27,24 @@ def get_farmers_markets(zip_code, radius):
     # else:
         #return error message or empty list
     url = f"{farmers_market_url}?{urllib.parse.urlencode(parameters)}"
-    print(url)
+    request = urllib.request.Request(url)
+    try:
+        # Send the request and process the response
+        with urllib.request.urlopen(request) as response:
+            if response.code == 200:
+                # Parse JSON data
+                data = json.loads(response.read())
+                # Assuming the response returns a list of markets under a key, e.g., "markets"
+                markets = data.get("data", [])[:max_results]
+                return markets
+            else:
+                print(f"Error: Received status code {response.code}")
+                return []
+    except urllib.error.URLError as e:
+        print(f"Request failed: {e}")
+        return []
+
+
     # try:
     #     with urllib.request.urlopen(url) as response:
     #         data = json.loads(response.read().decode())
@@ -66,33 +83,26 @@ def get_recipes(ingredients, cuisine_type=None, health_label=None, max_results=1
     headers = {
         "Edamam-Account-User": "nenman"
     }
-    req = urllib.request.Request(url, headers=headers)
+    request = urllib.request.Request(url, headers=headers)
 
     try:
-        # Make the request
-        with urllib.request.urlopen(req) as response:
-            # Parse the JSON response
-            data = json.load(response)
-            hits = data['hits'][:max_results]  # Take only the first 'max_results' hits
-            print(json.dumps(hits, indent=2))
-    except urllib.error.HTTPError as e:
-        print(f"HTTPError: {e.code} - {e.reason}")
-        print(e.read().decode())  # Additional error details
+        with urllib.request.urlopen(request) as response:
+            if response.code == 200:
+                data = json.loads(response.read())
+                # Return the top recipes
+                print(data.get("hits", [])[max_results])
+                return data.get("hits", [])[:max_results]
+            else:
+                print(f"Error: {response.code}")
+                return []
     except urllib.error.URLError as e:
-        print(f"URLError: {e.reason}")
+        print(f"Request failed: {e}")
+        return []
 
 
-    # request recipe data using GET with parameters
-    # if response is valid:
-    # return parsed json data with list of recipes
-    # else:
-    # return error message or empty list
-
-
-
-get_farmers_markets(98105, 5)
+print(get_farmers_markets(98105, 5, 2))
 #get_recipes("chicken", "Indian", "gluten-free", 3)
-get_recipes("spagetti squash", None, None, 1)
+#get_recipes("spagetti squash", None, None, 1)
 
 
 # "label" --> Recipe name
@@ -105,19 +115,38 @@ def index():
     # method GET
     #return homepage
     # render "index.html" template with a form to enter zip code, radius, recipe query, and preferences
+    return render_template('index.html')
 
 
-@app.route('/results')
+@app.route('/results', methods=['GET', 'POST'])
 def results():
-#     method post
-#     retrieve form data
-#         zip code and radius for farmers markets
-#         query, health, cuisineType, for recipes
-#     call get_farmers_markets
-#     call get_recipes
-#     render "results.html" template
-#         list of farmers markets
-#         list of recipes
+    if request.method == 'POST':
+        try:
+            zip_code = request.form.get('zip code')
+            radius = request.form.get('radius')
+            ingredients = request.form.get('ingredients')
+            cuisine = request.form.get('cuisine')
+            health = request.form.get('health label')
+            max_results = int(request.form.get('max_results'))
+
+            # parse through ingredients list???
+            # ingredients_list = [item.strip() for item in ingredients.split(",")]
+
+            recipes = get_recipes(ingredients, cuisine, health, max_results)
+            farmers_markets = get_farmers_markets(zip_code, radius)
+
+            return render_template('results.html', recipes=recipes, farmers_markets=farmers_markets)
+        except Exception as e:
+            print(f"Error occurred: {e}")
+            return render_template('error.html', message=f"An error occurred: {e}")
+    return render_template('index.html')
+
+
+if __name__ == "__main__":
+    app.run(debug=True)
+
+
+
 
 
 
