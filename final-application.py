@@ -1,11 +1,11 @@
-import urllib.parse, urllib.request, urllib.error, json
+import urllib.parse, urllib.request, urllib.error, json, requests, time, pprint
 from flask import Flask, render_template, request
 
 app = Flask(__name__)
 # API Info
 
 # farmers market info
-farmers_market_key = "pMGafX8SEb"
+farmers_market_key = "a8LhipbR0Z"
 farmers_market_url = "https://www.usdalocalfoodportal.com/api/farmersmarket/"
 
 # recipe finder info
@@ -21,40 +21,22 @@ def get_farmers_markets(zip_code, radius,max_results=5):
         "radius": radius
     }
 
-    # request farmers market data using GET with parameters
-    # if response is valid:
-        # return parsed json data with list of farmers markets
-    # else:
-        #return error message or empty list
-    url = f"{farmers_market_url}?{urllib.parse.urlencode(parameters)}"
-    print(url)
     headers = {
         "User-Agent": "MyApp/1.0"
     }
-    request = urllib.request.Request(url, headers=headers)
-
-    try:
-        # Send the request and process the response
-        with urllib.request.urlopen(request) as response:
-            if response.code == 200:
-                # Parse JSON data
-                data = json.loads(response.read().decode('utf-8'))
-                print(json.dumps(data, indent=2))
-                # Assuming the response returns a list of markets under a key, e.g., "markets" or "data"
-                markets = data.get("data", [])[:max_results]
-                return markets
+    results = []
+    for _ in range(max_results):
+        try:
+            response = requests.get(farmers_market_url, params=parameters, headers=headers)
+            if response.status_code == 200:
+                results.append(response.json())
             else:
-                print(f"Error: Received status code {response.code}")
-                return []
-    except urllib.error.HTTPError as e:
-        print(f"HTTP Error: {e.code} - {e.reason}")
-        # Print detailed error message from the API response body
-        if e.fp:
-            print(f"Error Details: {e.fp.read().decode('utf-8')}")
-        return []
-    except urllib.error.URLError as e:
-        print(f"Request failed: {e.reason}")
-        return []
+                print(f"Error {response.status_code}: {response.text}")
+            time.sleep(1)  # Pause between requests
+        except requests.RequestException as e:
+            print(f"Request failed: {e}")
+            break
+    return results
 
 
     # try:
@@ -81,7 +63,7 @@ def get_recipes(ingredients, cuisine_type=None, health_label=None, max_results=1
         "app_id": edamam_id,
         "app_key": edamam_key,
         "from": 0,
-        "to": max_results
+        "to": 10
     }
     if health_label:
         params["health"] = health_label
@@ -92,15 +74,25 @@ def get_recipes(ingredients, cuisine_type=None, health_label=None, max_results=1
     headers = {
         "Edamam-Account-User": "nenman"
     }
+    print(url, headers)
     request = urllib.request.Request(url, headers=headers)
+
 
     try:
         with urllib.request.urlopen(request) as response:
             if response.code == 200:
                 data = json.loads(response.read())
-                # Return the top recipes
-                print(data.get("hits", [])[max_results])
-                return data.get("hits", [])[:max_results]
+                hits = data.get("hits", [])[:max_results]
+                filtered_recipes = []
+                for hit in hits:
+                    recipe = hit.get("recipe", {})
+                    filtered_recipes.append({
+                        "label": recipe.get("label"),
+                        "source": recipe.get("url"),
+                        "image": recipe.get("image"),
+                        "ingredients": recipe.get("ingredientLines")
+                    })
+                return filtered_recipes
             else:
                 print(f"Error: {response.code}")
                 return []
@@ -109,14 +101,14 @@ def get_recipes(ingredients, cuisine_type=None, health_label=None, max_results=1
         return []
 
 
-print(get_farmers_markets(98105, 5, 2))
-#get_recipes("chicken", "Indian", "gluten-free", 3)
+#get_farmers_markets(98105, 5, 2)
+pprint.pprint(get_recipes("chicken", "Italian", "gluten-free", 3))
 #get_recipes("spagetti squash", None, None, 1)
 
 
 # "label" --> Recipe name
 # "image" --> image link
-# "ingredientLines" --> list of inf=gredient lines
+# "ingredientLines" --> list of ingredient lines
 # "url" --> link to "martha stewart recipe
 
 # @app.route('/')
