@@ -5,7 +5,7 @@
 <h1>Farmers Market and Recipes</h1>
     <h2>Farmers Markets Located Near You</h2>
     <ul>
-        <-- loop through farmers market data -->
+        {# loop through farmers market data #}
         {% for market in farmers_markets %}
         <li>
             <strong>{{ market.name }}</strong><br>
@@ -16,14 +16,24 @@
     </ul>
 
 <h2>Recipe Ideas</h2>
-<ul>
-    {% for recipe in recipes %}
-    <li>
-        <strong>{{ recipe.recipe.label }}</strong><br>
-        <a href="{{ recipe.recipe.url }}" target="_blank">View Recipe</a><br>
-    </li>
-    {% endfor %}
-</ul>
+    {% if recipes|length == 0 %}
+        <p>No recipes found. Please try a different search.</p>
+    {% else %}
+        <div class="recipes">
+            {% for recipe in recipes %}
+                <div class="recipe">
+                    <h3><a href="{{ recipe.url }}" target="_blank">{{ recipe.label }}</a></h3>
+                    <img src="{{ recipe.image }}" alt="{{ recipe.label }}">
+                    <h4>Ingredients:</h4>
+                    <ul>
+                        {% for ingredient in recipe.ingredients %}
+                            <li>{{ ingredient }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
 <a href="/">Go Back</a>
 {% endblock %}
 
