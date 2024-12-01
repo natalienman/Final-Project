@@ -1,4 +1,4 @@
-import urllib.parse, urllib.request, urllib.error, json, pprint
+import urllib.parse, urllib.request, urllib.error, json
 from flask import Flask, render_template, request
 
 app = Flask(__name__)
@@ -27,21 +27,33 @@ def get_farmers_markets(zip_code, radius,max_results=5):
     # else:
         #return error message or empty list
     url = f"{farmers_market_url}?{urllib.parse.urlencode(parameters)}"
-    request = urllib.request.Request(url)
+    print(url)
+    headers = {
+        "User-Agent": "MyApp/1.0"
+    }
+    request = urllib.request.Request(url, headers=headers)
+
     try:
         # Send the request and process the response
         with urllib.request.urlopen(request) as response:
             if response.code == 200:
                 # Parse JSON data
-                data = json.loads(response.read())
-                # Assuming the response returns a list of markets under a key, e.g., "markets"
+                data = json.loads(response.read().decode('utf-8'))
+                print(json.dumps(data, indent=2))
+                # Assuming the response returns a list of markets under a key, e.g., "markets" or "data"
                 markets = data.get("data", [])[:max_results]
                 return markets
             else:
                 print(f"Error: Received status code {response.code}")
                 return []
+    except urllib.error.HTTPError as e:
+        print(f"HTTP Error: {e.code} - {e.reason}")
+        # Print detailed error message from the API response body
+        if e.fp:
+            print(f"Error Details: {e.fp.read().decode('utf-8')}")
+        return []
     except urllib.error.URLError as e:
-        print(f"Request failed: {e}")
+        print(f"Request failed: {e.reason}")
         return []
 
 
@@ -56,9 +68,6 @@ def get_farmers_markets(zip_code, radius,max_results=5):
     #             for market in market_data:
     #                 if market["directory_type"] == "farmersmarket":
     #                     market_list.
-
-
-
 
 
 
@@ -110,40 +119,39 @@ print(get_farmers_markets(98105, 5, 2))
 # "ingredientLines" --> list of inf=gredient lines
 # "url" --> link to "martha stewart recipe
 
-@app.route('/')
-def index():
-    # method GET
-    #return homepage
-    # render "index.html" template with a form to enter zip code, radius, recipe query, and preferences
-    return render_template('index.html')
-
-
-@app.route('/results', methods=['GET', 'POST'])
-def results():
-    if request.method == 'POST':
-        try:
-            zip_code = request.form.get('zip code')
-            radius = request.form.get('radius')
-            ingredients = request.form.get('ingredients')
-            cuisine = request.form.get('cuisine')
-            health = request.form.get('health label')
-            max_results = int(request.form.get('max_results'))
-
-            # parse through ingredients list???
-            # ingredients_list = [item.strip() for item in ingredients.split(",")]
-
-            recipes = get_recipes(ingredients, cuisine, health, max_results)
-            farmers_markets = get_farmers_markets(zip_code, radius)
-
-            return render_template('results.html', recipes=recipes, farmers_markets=farmers_markets)
-        except Exception as e:
-            print(f"Error occurred: {e}")
-            return render_template('error.html', message=f"An error occurred: {e}")
-    return render_template('index.html')
-
-
-if __name__ == "__main__":
-    app.run(debug=True)
+# @app.route('/')
+# def index():
+#     # method GET
+#     # return homepage
+#     # render "index.html" template with a form to enter zip code, radius, recipe query, and preferences
+#     return render_template('index.html')
+#
+#
+# @app.route('/results', methods=['GET', 'POST'])
+# def results():
+#     if request.method == 'POST':
+#         try:
+#             zip_code = request.form.get('zip code')
+#             radius = request.form.get('radius')
+#             ingredients = request.form.get('ingredients')
+#             cuisine = request.form.get('cuisine')
+#             health = request.form.get('health label')
+#             max_results = int(request.form.get('max_results'))
+#
+#             # parse through ingredients list???
+#             # ingredients_list = [item.strip() for item in ingredients.split(",")]
+#
+#             recipes = get_recipes(ingredients, cuisine, health, max_results)
+#             farmers_markets = get_farmers_markets(zip_code, radius)
+#
+#             return render_template('results.html', recipes=recipes, farmers_markets=farmers_markets)
+#         except Exception as e:
+#             print(f"Error occurred: {e}")
+#             return render_template('error.html', message=f"An error occurred: {e}")
+#     return render_template('index.html')
+#
+# if __name__ == "__main__":
+#     app.run(debug=True)
 
 
 
