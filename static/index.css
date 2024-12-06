@@ -1,0 +1,15 @@
+header {
+    text-align: center;
+    font-family: Verdana, sans-serif;
+    color: #748268;
+}
+
+body {
+    font-family: Verdana, sans-serif;
+    color: #4B5444;
+    text-align: center;
+    background: linear-gradient(to bottom, #f5f5f5, #c1d7ae);
+    min-height: 100vh;
+    margin: 0;
+    padding: 0;
+}
