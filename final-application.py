@@ -1,13 +1,14 @@
 import urllib.parse, urllib.request, urllib.error, json
 from flask import Flask, render_template, request
+from keys import API_ID, API_KEY
 
 app = Flask(__name__)
 # API Info
 
 
 # recipe finder info
-edamam_id = "1eeca7af"
-edamam_key = "68bfe1b3723a03103e9ce043fbd9661c"
+edamam_id = API_ID
+edamam_key = API_KEY
 edamam_url = "https://api.edamam.com/api/recipes/v2"
 
 def get_recipes(ingredients, cuisine_type=None, health_label=None, max_results=18):
@@ -83,14 +84,13 @@ def results():
             else:
                 max_results = int(max_results)
 
-            # parse through ingredients list???
-            # ingredients_list = [item.strip() for item in ingredients.split(",")]
-
             recipes = get_recipes(ingredients, cuisine, health, max_results)
+
+            # if no recipes --> take to no recipes pages
             if not recipes:
                 return render_template('no-results.html')
 
-            return render_template('results.html', recipes=recipes)
+            return render_template('results.html', recipes=recipes, ingredients=ingredients)
         except Exception as e:
             print(f"Error occurred: {e}")
             return render_template('error.html', message=f"An error occurred: {e}")
@@ -101,15 +101,6 @@ if __name__ == "__main__":
 
 
 
-
-
-
-
-
-
-
-# link to recipe does not work
-# needs to put in a max result
 
 
 
