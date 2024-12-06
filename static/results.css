@@ -1,9 +1,27 @@
-    header{
+    header {
         text-align: center;
+        font-family: Verdana, sans-serif;
+        color: #4B5444;
+    }
+
+    h2 {
+        text-align: center;
+        font-family: Verdana, sans-serif;
+        color: #6EB563;
     }
     body {
-        font-family: "Calibri";
+        font-family: Verdana, sans-serif;
+        color: #4B5444;
         text-align: center;
+    }
+    a {
+        color: #4B5444;
+        text-decoration: none;
+    }
+
+    a:hover {
+        color: #6EB563;
+        text-decoration: underline;
     }
     img {
         max-width: 200px;
