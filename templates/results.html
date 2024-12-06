@@ -8,7 +8,7 @@
 {% block content %}
 
 
-<h1>Some Ideas</h1>
+<h2>{{ ingredients.capitalize() }} Recipe Inspiration</h2>
     <div class="recipe-grid">
             {% for recipe in recipes %}
                 <div class="recipe-card">
@@ -23,7 +23,6 @@
                 </div>
             {% endfor %}
         </div>
-    {% endif %}
 <a href="/">Go Back</a>
 {% endblock %}
 
