@@ -2,12 +2,12 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>{% block title %}Farmers Market & Recipes{% endblock %}</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <title>{% block title %}Recipes{% endblock %}</title>
+    {% block extra_css %}{% endblock %}
 </head>
 <body>
     <header>
-        <h1>Farmers Market & Recipe Finder</h1>
+        <h1>Recipe Roulette</h1>
     </header>
     <main>
         {% block content %}{% endblock %}

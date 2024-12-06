@@ -1,28 +1,18 @@
 {% extends "base.html" %}
+
+{% block extra_css %}
+<link rel="stylesheet" href="{{ url_for('static', filename='results.css') }}">
+{% endblock %}
+
 {% block title %}Results{% endblock %}
 {% block content %}
 
-<h1>Farmers Market and Recipes</h1>
-    <h2>Farmers Markets Located Near You</h2>
-    <ul>
-        {# loop through farmers market data #}
-        {% for market in farmers_markets %}
-        <li>
-            <strong>{{ market.name }}</strong><br>
-            {{ market.address }}
-            Distance: {{ market.distance }} miles
-        </li>
-        {% endfor %}
-    </ul>
 
-<h2>Recipe Ideas</h2>
-    {% if recipes|length == 0 %}
-        <p>No recipes found. Please try a different search.</p>
-    {% else %}
-        <div class="recipes">
+<h1>Some Ideas</h1>
+    <div class="recipe-grid">
             {% for recipe in recipes %}
-                <div class="recipe">
-                    <h3><a href="{{ recipe.url }}" target="_blank">{{ recipe.label }}</a></h3>
+                <div class="recipe-card">
+                    <h3><a href="{{ recipe.source }}" target="_blank">{{ recipe.label }}</a></h3>
                     <img src="{{ recipe.image }}" alt="{{ recipe.label }}">
                     <h4>Ingredients:</h4>
                     <ul>
